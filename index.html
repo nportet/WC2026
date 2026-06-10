@@ -42,7 +42,7 @@ header{padding:max(28px,env(safe-area-inset-top)) 0 12px}
 
 .nav{display:flex;gap:6px;margin-top:18px;background:var(--panel2);border:1px solid var(--line2);border-radius:14px;padding:5px}
 .nav button{flex:1;appearance:none;border:0;background:transparent;color:var(--mut);font-family:'Manrope';font-weight:800;
-  font-size:14px;letter-spacing:.3px;padding:12px;border-radius:10px;cursor:pointer;transition:.18s}
+  font-size:13px;letter-spacing:.2px;padding:11px 5px;border-radius:10px;cursor:pointer;transition:.18s}
 .nav button.on{background:var(--acc);color:#fff;box-shadow:var(--shadow)}
 
 .controls{position:sticky;top:0;z-index:5;margin:12px -16px 0;padding:12px 16px;
@@ -139,6 +139,37 @@ header{padding:max(28px,env(safe-area-inset-top)) 0 12px}
 .gs b{font-size:14px;font-weight:800;color:var(--txt);margin-top:2px}
 .geoknown{margin-top:9px;font-size:12px;line-height:1.55;color:var(--mut);font-weight:500}
 .wxblock{margin-top:13px;border-top:1px dashed var(--line2);padding-top:12px}
+.pred{margin-top:13px;border-top:1px dashed var(--line2);padding-top:11px}
+.predhd{font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--mut);margin-bottom:8px}
+.predrow{display:flex;align-items:center;gap:7px}
+.predrow .pn{font-size:12px;font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.predrow .pnr{text-align:right}
+.pin{width:42px;text-align:center;font-family:'Spline Sans Mono';font-weight:600;font-size:15px;padding:6px 2px;border:1px solid var(--line2);border-radius:8px;background:var(--panel);color:var(--txt)}
+.predrow em{font-style:normal;color:var(--mut2);font-weight:700}
+.psave{appearance:none;border:0;background:var(--acc);color:#fff;font-family:'Manrope';font-weight:800;font-size:12px;padding:7px 11px;border-radius:8px;cursor:pointer;white-space:nowrap}
+.predres{margin-top:8px;font-size:11.5px;font-weight:700;padding:6px 9px;border-radius:8px}
+.predres.hit{background:rgba(12,138,67,.14);color:var(--acc)}
+.predres.part{background:rgba(185,130,10,.16);color:var(--gold)}
+.predres.miss{background:var(--panel2);color:var(--mut)}
+.predsum{text-align:center;padding:24px 0 6px}
+.bigpts{font-family:'Anton';font-size:62px;line-height:1;color:var(--acc)}
+.psub{color:var(--mut);font-size:13px;font-weight:600;margin-top:4px}
+.predlist{margin-top:14px}
+.prow{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-bottom:8px;box-shadow:var(--shadow)}
+.pteams{font-weight:700;font-size:13.5px}
+.pp{font-family:'Spline Sans Mono';font-size:12px;font-weight:600;padding:4px 8px;border-radius:7px;white-space:nowrap}
+.pp.hit{background:rgba(12,138,67,.14);color:var(--acc)}
+.pp.part{background:rgba(185,130,10,.16);color:var(--gold)}
+.pp.miss{background:var(--panel2);color:var(--mut)}
+.pp.pend{background:rgba(10,143,122,.12);color:var(--teal)}
+.scorers{margin-top:16px}
+.srow{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px;box-shadow:var(--shadow)}
+.srank{font-family:'Anton';font-size:20px;color:var(--mut2);width:26px;text-align:center}
+.srow:nth-child(1) .srank{color:var(--gold)}
+.srow:nth-child(2) .srank,.srow:nth-child(3) .srank{color:var(--acc)}
+.sname{font-weight:800;font-size:15px;flex:1}
+.steam{font-size:12px;color:var(--mut);font-weight:600}
+.sgoals{font-family:'Anton';font-size:22px;color:var(--acc);min-width:26px;text-align:right}
 
 .ggrid{margin-top:16px;display:grid;grid-template-columns:1fr;gap:14px}
 @media(min-width:620px){.ggrid{grid-template-columns:1fr 1fr}}
@@ -183,6 +214,8 @@ footer code{font-family:'Spline Sans Mono';color:var(--teal);font-size:11px}
     <nav class="nav" id="nav">
       <button data-view="fixtures" class="on">Fixtures</button>
       <button data-view="groups">Groups</button>
+      <button data-view="predict">Predict</button>
+      <button data-view="scorers">Scorers</button>
     </nav>
   </header>
 
@@ -214,12 +247,49 @@ const MATCHES = [{"id": 1, "utc": "2026-06-11T19:00:00Z", "stage": "Group Stage"
 const GROUPS = {"A": ["Mexico", "South Korea", "South Africa", "Czechia"], "B": ["Canada", "Switzerland", "Qatar", "Bosnia and Herzegovina"], "C": ["Brazil", "Morocco", "Scotland", "Haiti"], "D": ["USA", "Paraguay", "Australia", "Turkiye"], "E": ["Germany", "Ecuador", "Ivory Coast", "Curacao"], "F": ["Netherlands", "Japan", "Tunisia", "Sweden"], "G": ["Belgium", "Iran", "Egypt", "New Zealand"], "H": ["Spain", "Uruguay", "Saudi Arabia", "Cape Verde"], "I": ["France", "Senegal", "Norway", "Iraq"], "J": ["Argentina", "Austria", "Algeria", "Jordan"], "K": ["Portugal", "Colombia", "Uzbekistan", "DR Congo"], "L": ["England", "Croatia", "Panama", "Ghana"]};
 const VENUES = {"atl": {"stadium": "Mercedes-Benz Stadium", "city": "Atlanta", "country": "USA", "lat": 33.7554, "lon": -84.4008, "cap": "71,000", "pop": "6.3 million (metro)", "known": "Georgia's capital and home of Coca-Cola, CNN and the civil-rights movement — Dr. Martin Luther King Jr.'s birthplace."}, "bos": {"stadium": "Gillette Stadium", "city": "Boston (Foxborough)", "country": "USA", "lat": 42.0909, "lon": -71.2643, "cap": "65,800", "pop": "4.9 million (metro)", "known": "One of America's oldest cities and cradle of the 1776 Revolution; home to Harvard and MIT. The stadium sits ~40 km southwest in Foxborough."}, "dal": {"stadium": "AT&T Stadium", "city": "Dallas (Arlington)", "country": "USA", "lat": 32.7473, "lon": -97.0945, "cap": "80,000", "pop": "7.9 million (metro)", "known": "A Texas business and tech hub; the stadium stands in Arlington, between Dallas and Fort Worth."}, "gdl": {"stadium": "Estadio Akron", "city": "Guadalajara", "country": "Mexico", "lat": 20.6818, "lon": -103.4626, "cap": "48,000", "pop": "5.3 million (metro)", "known": "Mexico's second-largest city — the birthplace of mariachi music and the heart of tequila country."}, "hou": {"stadium": "NRG Stadium", "city": "Houston", "country": "USA", "lat": 29.6847, "lon": -95.4107, "cap": "72,000", "pop": "7.3 million (metro)", "known": "‘Space City’ — home of NASA's Mission Control — and the energy capital of the US; one of America's most diverse cities."}, "kc": {"stadium": "Arrowhead Stadium", "city": "Kansas City", "country": "USA", "lat": 39.0489, "lon": -94.4839, "cap": "76,400", "pop": "2.4 million (metro)", "known": "Famed for its barbecue and jazz heritage, with more fountains than any city except Rome."}, "la": {"stadium": "SoFi Stadium", "city": "Los Angeles (Inglewood)", "country": "USA", "lat": 33.9535, "lon": -118.3392, "cap": "70,000", "pop": "12.9 million (metro)", "known": "The entertainment capital of the world — Hollywood, Pacific beaches and near-endless sunshine."}, "mex": {"stadium": "Estadio Azteca", "city": "Mexico City", "country": "Mexico", "lat": 19.3029, "lon": -99.1505, "cap": "83,000", "pop": "22 million (metro)", "known": "Built over the Aztec capital Tenochtitlan; one of the world's largest cities, sitting at 2,240 m altitude."}, "mia": {"stadium": "Hard Rock Stadium", "city": "Miami (Miami Gardens)", "country": "USA", "lat": 25.958, "lon": -80.2389, "cap": "65,300", "pop": "6.1 million (metro)", "known": "A gateway to Latin America known for its beaches, Art Deco South Beach and vibrant nightlife."}, "mty": {"stadium": "Estadio BBVA", "city": "Monterrey", "country": "Mexico", "lat": 25.6693, "lon": -100.244, "cap": "53,500", "pop": "5.3 million (metro)", "known": "Mexico's industrial powerhouse, ringed by the Sierra Madre and the iconic saddle-shaped Cerro de la Silla."}, "nyj": {"stadium": "MetLife Stadium", "city": "New York/New Jersey", "country": "USA", "lat": 40.8135, "lon": -74.0745, "cap": "82,500", "pop": "19 million (metro)", "known": "Just across the Hudson from New York City — global finance, Broadway and the Statue of Liberty. Hosts the opening match and the final."}, "phi": {"stadium": "Lincoln Financial Field", "city": "Philadelphia", "country": "USA", "lat": 39.9008, "lon": -75.1675, "cap": "69,800", "pop": "6.2 million (metro)", "known": "Birthplace of the United States — the Liberty Bell and Independence Hall — and of the cheesesteak."}, "sf": {"stadium": "Levi's Stadium", "city": "San Francisco Bay (Santa Clara)", "country": "USA", "lat": 37.403, "lon": -121.97, "cap": "68,500", "pop": "7.7 million (Bay Area)", "known": "The heart of Silicon Valley; the stadium is in Santa Clara, south of the Golden Gate Bridge."}, "sea": {"stadium": "Lumen Field", "city": "Seattle", "country": "USA", "lat": 47.5952, "lon": -122.3316, "cap": "68,700", "pop": "4 million (metro)", "known": "The coffee and tech capital (Starbucks, Amazon, Microsoft), watched over by the Space Needle."}, "tor": {"stadium": "BMO Field", "city": "Toronto", "country": "Canada", "lat": 43.6332, "lon": -79.4185, "cap": "45,000", "pop": "6.4 million (metro)", "known": "Canada's largest and most multicultural city, crowned by the CN Tower."}, "van": {"stadium": "BC Place", "city": "Vancouver", "country": "Canada", "lat": 49.2767, "lon": -123.1119, "cap": "54,500", "pop": "2.6 million (metro)", "known": "Where the mountains meet the ocean; a major film-production hub nicknamed ‘Hollywood North’."}};
 
-const RESULTS_URL = "";
-let RESULTS = {};
+// ── Live feed ───────────────────────────────────────────────────────
+// Paste your Cloudflare Worker URL below (see setup guide). It returns
+// { fixtures:[...], scorers:[...] } sourced from API-Football. The key
+// lives only in the Worker, never here.
+const RESULTS_URL = "https://wc26-feed.nportet.workers.dev";
+let RESULTS = {}, SCORERS = [];
+
+const TEAM_ALIAS = {"korea republic":"south korea","republic of korea":"south korea","czech republic":"czechia",
+ "cote divoire":"ivory coast","turkey":"turkiye","united states":"usa","cabo verde":"cape verde",
+ "congo dr":"dr congo","democratic republic of the congo":"dr congo","bosnia and herzegovina":"bosnia and herzegovina"};
+function canon(n){
+  let s=(n||"").normalize("NFKD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z ]/g,"").replace(/\s+/g," ").trim();
+  return TEAM_ALIAS[s]||s;
+}
+function mapStatus(st){
+  if(["FT","AET","PEN"].includes(st))return"finished";
+  if(["1H","2H","HT","ET","BT","P","LIVE","INT","SUSP"].includes(st))return"live";
+  return"upcoming";
+}
 async function fetchResults(){
-  if(!RESULTS_URL) return;
-  try{ const r=await fetch(RESULTS_URL,{cache:"no-store"}); RESULTS=await r.json(); }
-  catch(e){ console.warn("results fetch failed",e); }
+  if(!RESULTS_URL||RESULTS_URL.indexOf("PASTE")>=0) return;
+  try{
+    const data=await (await fetch(RESULTS_URL,{cache:"no-store"})).json();
+    const fx=(data.fixtures||[]).map(f=>({ts:Date.parse(f.ts),day:new Date(f.ts).toISOString().slice(0,10),
+      hp:canon(f.home),ap:canon(f.away),hg:f.hg,ag:f.ag,st:mapStatus(f.st)}));
+    const out={};
+    MATCHES.forEach(m=>{
+      let pick=null;
+      if(m.stage==="Group Stage"){
+        const a=canon(m.home),b=canon(m.away);
+        pick=fx.find(f=>(f.hp===a&&f.ap===b)||(f.hp===b&&f.ap===a));
+      } else {
+        const myts=Date.parse(m.utc),myday=new Date(m.utc).toISOString().slice(0,10);
+        let cand=fx.filter(f=>f.day===myday); if(!cand.length)cand=fx;
+        pick=cand.reduce((best,f)=>(!best||Math.abs(f.ts-myts)<Math.abs(best.ts-myts))?f:best,null);
+        if(pick&&Math.abs(pick.ts-myts)>6*3600000)pick=null;
+      }
+      if(pick&&pick.hg!=null)out[m.id]={h:pick.hg,a:pick.ag,status:pick.st};
+      else if(pick)out[m.id]={status:pick.st};
+    });
+    RESULTS=out;
+    SCORERS=data.scorers||[];
+  }catch(e){ console.warn("feed fetch failed",e); }
 }
 
 let VIEW="fixtures", TZ="Australia/Sydney", FILTER="all", QUERY="";
@@ -356,6 +426,7 @@ async function loadWx(id,panel){
   }catch(e){panel.innerHTML='<div class="wxhint">Couldn’t load the forecast right now — pull to refresh.</div>';}
 }
 document.getElementById("list").addEventListener("click",e=>{
+  if(e.target.closest(".wx")){ const sb=e.target.closest(".psave"); if(sb) savePrediction(sb); return; }
   const card=e.target.closest(".match.expandable");if(!card)return;
   card.classList.toggle("open");
   if(card.classList.contains("open")){
@@ -363,12 +434,80 @@ document.getElementById("list").addEventListener("click",e=>{
     if(panel&&panel.dataset.loaded==="0"){
       panel.dataset.loaded="1";
       const m=MATCHES.find(x=>x.id===+card.dataset.id);
-      panel.innerHTML=venueHTML(m)+'<div class="wxblock"><div class="wxhint">Loading forecast…</div></div>';
+      panel.innerHTML=venueHTML(m)+predHTML(m)+'<div class="wxblock"><div class="wxhint">Loading forecast…</div></div>';
       loadWx(m.id,panel.querySelector(".wxblock"));
     }
   }
 });
-function render(){ VIEW==="groups"?renderGroups():renderFixtures(); }
+let PREDS={};
+try{PREDS=JSON.parse(localStorage.getItem("wc26preds")||"{}");}catch(e){PREDS={};}
+function savePreds(){try{localStorage.setItem("wc26preds",JSON.stringify(PREDS));}catch(e){}}
+function predPoints(p,r){
+  if(!p||!r||r.h==null)return null;
+  if(p.h===r.h&&p.a===r.a)return 3;
+  return Math.sign(p.h-p.a)===Math.sign(r.h-r.a)?1:0;
+}
+function predHTML(m){
+  if(m.stage!=="Group Stage")return"";
+  const p=PREDS[m.id]||{}, r=RESULTS[m.id];
+  let res="";
+  if(r&&r.h!=null){const pts=predPoints(p,r);
+    res = pts==null ? `<div class="predres miss">Final ${r.h}\u2013${r.a} \u00b7 you didn't predict this one</div>`
+      : `<div class="predres ${pts===3?'hit':pts===1?'part':'miss'}">Final ${r.h}\u2013${r.a} \u00b7 ${pts===3?'Exact score! +3':pts===1?'Right result +1':'Missed +0'}</div>`;
+  }
+  return `<div class="pred"><div class="predhd">Your prediction</div>`+
+    `<div class="predrow"><span class="pn">${m.home}</span>`+
+    `<input class="pin" type="number" min="0" max="30" inputmode="numeric" value="${p.h!=null?p.h:''}" data-s="h">`+
+    `<em>\u2013</em>`+
+    `<input class="pin" type="number" min="0" max="30" inputmode="numeric" value="${p.a!=null?p.a:''}" data-s="a">`+
+    `<span class="pn pnr">${m.away}</span>`+
+    `<button class="psave" data-id="${m.id}">Save</button></div>${res}</div>`;
+}
+function savePrediction(btn){
+  const id=+btn.dataset.id, panel=btn.closest(".wx");
+  const h=parseInt(panel.querySelector('.pin[data-s="h"]').value,10);
+  const a=parseInt(panel.querySelector('.pin[data-s="a"]').value,10);
+  if(isNaN(h)||isNaN(a)){btn.textContent="Enter both";setTimeout(()=>btn.textContent="Save",1200);return;}
+  PREDS[id]={h:Math.max(0,h),a:Math.max(0,a)};savePreds();
+  const m=MATCHES.find(x=>x.id===id);
+  panel.querySelector(".pred").outerHTML=predHTML(m);
+}
+function renderPredict(){
+  const list=document.getElementById("list");
+  const games=MATCHES.filter(m=>m.stage==="Group Stage");
+  let total=0,made=0,scored=0;const rows=[];
+  games.forEach(m=>{const p=PREDS[m.id];if(!p)return;made++;
+    const r=RESULTS[m.id];let cell;
+    if(r&&r.h!=null){const pts=predPoints(p,r);total+=pts;scored++;
+      cell=`<span class="pp ${pts===3?'hit':pts===1?'part':'miss'}">${p.h}\u2013${p.a} \u2192 ${r.h}\u2013${r.a} \u00b7 +${pts}</span>`;}
+    else cell=`<span class="pp pend">${p.h}\u2013${p.a} \u00b7 pending</span>`;
+    rows.push(`<div class="prow"><span class="pteams">${m.home} v ${m.away}</span>${cell}</div>`);
+  });
+  let html=`<div class="predsum"><div class="bigpts">${total}</div><div class="psub">points${made?` \u00b7 ${made} predicted${scored?`, ${scored} settled`:''}`:''}</div></div>`;
+  html += rows.length ? '<div class="predlist">'+rows.join("")+'</div>'
+    : '<div class="empty">No predictions yet.<br>Open a group match on Fixtures, tap Details, and enter a score.<br><br>3 pts for the exact score \u00b7 1 pt for the right result.</div>';
+  list.innerHTML=html;
+}
+function renderScorers(){
+  const list=document.getElementById("list");
+  let arr=[];
+  if(SCORERS&&SCORERS.length){ arr=SCORERS.slice().sort((a,b)=>b.g-a.g).slice(0,10); }
+  else {
+    const tally={};
+    MATCHES.forEach(m=>{const r=RESULTS[m.id];if(r&&r.scorers)r.scorers.forEach(s=>{const k=s.p+"|"+(s.t||"");(tally[k]=tally[k]||{p:s.p,t:s.t||"",g:0}).g++;});});
+    arr=Object.values(tally).sort((a,b)=>b.g-a.g||a.p.localeCompare(b.p)).slice(0,10);
+  }
+  if(!arr.length){list.innerHTML='<div class="empty">No goals yet.<br>The Golden Boot race begins when the tournament kicks off on 11 June.</div>';return;}
+  let html='<div class="scorers">';
+  arr.forEach((s,i)=>{html+=`<div class="srow"><span class="srank">${i+1}</span><span class="sname">${s.p}</span><span class="steam">${s.t}</span><span class="sgoals">${s.g}</span></div>`;});
+  list.innerHTML=html+'</div>';
+}
+function render(){
+  if(VIEW==="groups")renderGroups();
+  else if(VIEW==="predict")renderPredict();
+  else if(VIEW==="scorers")renderScorers();
+  else renderFixtures();
+}
 function stamp(){
   const t=new Intl.DateTimeFormat("en-AU",{timeZone:TZ,hour:"numeric",minute:"2-digit",hour12:true}).format(new Date());
   document.getElementById("updated").textContent="Updated "+t+(VIEW==="fixtures"?" · "+TZ.split("/")[1].replace("_"," ")+" time":"");
@@ -379,7 +518,8 @@ function applyView(){
   document.getElementById("filters").classList.toggle("hide",!fx);
   document.getElementById("searchbox").classList.toggle("hide",!fx);
   document.getElementById("tz").classList.toggle("hide",!fx);
-  document.getElementById("subline").innerHTML=fx?`All times in <b id="tzlabel">${TZ.split("/")[1].replace("_"," ")}</b>`:"Standings update as results come in";
+  const subs={groups:"Standings update as results come in",predict:"3 pts exact score \u00b7 1 pt correct result",scorers:"Golden Boot \u2014 top 10 goal scorers"};
+  document.getElementById("subline").innerHTML=fx?`All times in <b id="tzlabel">${TZ.split("/")[1].replace("_"," ")}</b>`:(subs[VIEW]||"");
   render();stamp();
 }
 document.getElementById("nav").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;VIEW=b.dataset.view;applyView();});
