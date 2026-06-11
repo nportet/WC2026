@@ -448,8 +448,11 @@ function predPoints(p,r){
   return Math.sign(p.h-p.a)===Math.sign(r.h-r.a)?1:0;
 }
 function predHTML(m){
-  if(m.stage!=="Group Stage")return"";
-  const p=PREDS[m.id]||{}, r=RESULTS[m.id];
+  const r=RESULTS[m.id];
+  if(m.stage!=="Group Stage"){
+    return (r&&r.h!=null)?`<div class="pred"><div class="predres hit">Full time ${r.h}\u2013${r.a}</div></div>`:"";
+  }
+  const p=PREDS[m.id]||{};
   let res="";
   if(r&&r.h!=null){const pts=predPoints(p,r);
     res = pts==null ? `<div class="predres miss">Final ${r.h}\u2013${r.a} \u00b7 you didn't predict this one</div>`
