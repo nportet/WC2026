@@ -256,6 +256,7 @@ let RESULTS = {}, SCORERS = [];
 
 const TEAM_ALIAS = {"korea republic":"south korea","republic of korea":"south korea","czech republic":"czechia",
  "cote divoire":"ivory coast","turkey":"turkiye","united states":"usa","cabo verde":"cape verde",
+ "cape verde islands":"cape verde","bosnia herzegovina":"bosnia and herzegovina",
  "congo dr":"dr congo","democratic republic of the congo":"dr congo","bosnia and herzegovina":"bosnia and herzegovina"};
 function canon(n){
   let s=(n||"").normalize("NFKD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z ]/g,"").replace(/\s+/g," ").trim();
