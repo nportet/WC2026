@@ -152,6 +152,18 @@ header{padding:max(28px,env(safe-area-inset-top)) 0 12px}
 .predres.part{background:rgba(185,130,10,.16);color:var(--gold)}
 .predres.miss{background:var(--panel2);color:var(--mut)}
 .predsum{text-align:center;padding:24px 0 6px}
+.pchip{font-size:8.5px;font-weight:800;letter-spacing:.4px;padding:3px 7px;border-radius:5px;color:#fff;flex:0 0 auto}
+.pchip.noah{background:#2f5bd0}.pchip.nic{background:var(--acc)}
+.predrow+.predrow{margin-top:7px}
+.h2h{display:flex;align-items:center;justify-content:center;gap:16px}
+.h2c{display:flex;flex-direction:column;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px 24px;box-shadow:var(--shadow)}
+.h2c i{font-style:normal;font-size:10px;font-weight:800;letter-spacing:.6px}
+.h2c b{font-family:'Anton';font-size:44px;line-height:1.05}
+.h2c.noah i,.h2c.noah b{color:#2f5bd0}
+.h2c.nic i,.h2c.nic b{color:var(--acc)}
+.vs{font-weight:800;color:var(--mut2);font-size:12px}
+.fres{font-style:normal;color:var(--mut);font-family:'Spline Sans Mono';font-size:11px;margin-left:6px}
+.ppair{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
 .bigpts{font-family:'Anton';font-size:62px;line-height:1;color:var(--acc)}
 .psub{color:var(--mut);font-size:13px;font-weight:600;margin-top:4px}
 .predlist{margin-top:14px}
@@ -238,7 +250,7 @@ footer code{font-family:'Spline Sans Mono';color:var(--teal);font-size:11px}
 
   <footer>
     Group order uses points, then goal difference, then goals scored (FIFA also applies head-to-head). Times auto-convert with daylight saving via your browser.<br>
-    For live scores &amp; standings, point <code>RESULTS_URL</code> in the source at your football API; Refresh fetches it.
+    Live scores, standings &amp; the Golden Boot update automatically from the feed (data refreshes about every 30 minutes — top scorers can take up to a day to process).
   </footer>
 </div>
 
@@ -440,56 +452,87 @@ document.getElementById("list").addEventListener("click",e=>{
     }
   }
 });
-let PREDS={};
-try{PREDS=JSON.parse(localStorage.getItem("wc26preds")||"{}");}catch(e){PREDS={};}
-function savePreds(){try{localStorage.setItem("wc26preds",JSON.stringify(PREDS));}catch(e){}}
+const PLAYERS=[["noah","NOAH"],["nic","NIC"]];
+let PREDS={noah:{},nic:{}};
+try{
+  const v2=localStorage.getItem("wc26preds2");
+  if(v2){PREDS=JSON.parse(v2);}
+  PREDS.noah=PREDS.noah||{};PREDS.nic=PREDS.nic||{};
+  const old=localStorage.getItem("wc26preds");
+  if(old&&!localStorage.getItem("wc26mig")){
+    const o=JSON.parse(old);
+    for(const k in o){
+      PREDS.noah[k]=o[k];
+      if(PREDS.nic[k]&&PREDS.nic[k].h===o[k].h&&PREDS.nic[k].a===o[k].a)delete PREDS.nic[k];
+    }
+    localStorage.setItem("wc26mig","1");
+    savePreds();
+  }
+}catch(e){PREDS={noah:{},nic:{}};}
+function savePreds(){try{localStorage.setItem("wc26preds2",JSON.stringify(PREDS));}catch(e){}}
 function predPoints(p,r){
   if(!p||!r||r.h==null)return null;
   if(p.h===r.h&&p.a===r.a)return 3;
   return Math.sign(p.h-p.a)===Math.sign(r.h-r.a)?1:0;
+}
+function predRow(m,pid,label){
+  const p=PREDS[pid][m.id]||{};
+  return `<div class="predrow"><span class="pchip ${pid}">${label}</span>`+
+    `<input class="pin" type="number" min="0" max="30" inputmode="numeric" value="${p.h!=null?p.h:''}" data-s="h">`+
+    `<em>\u2013</em>`+
+    `<input class="pin" type="number" min="0" max="30" inputmode="numeric" value="${p.a!=null?p.a:''}" data-s="a">`+
+    `<button class="psave" data-id="${m.id}" data-p="${pid}">Save</button></div>`;
 }
 function predHTML(m){
   const r=RESULTS[m.id];
   if(m.stage!=="Group Stage"){
     return (r&&r.h!=null)?`<div class="pred"><div class="predres hit">Full time ${r.h}\u2013${r.a}</div></div>`:"";
   }
-  const p=PREDS[m.id]||{};
   let res="";
-  if(r&&r.h!=null){const pts=predPoints(p,r);
-    res = pts==null ? `<div class="predres miss">Final ${r.h}\u2013${r.a} \u00b7 you didn't predict this one</div>`
-      : `<div class="predres ${pts===3?'hit':pts===1?'part':'miss'}">Final ${r.h}\u2013${r.a} \u00b7 ${pts===3?'Exact score! +3':pts===1?'Right result +1':'Missed +0'}</div>`;
+  if(r&&r.h!=null){
+    const bits=PLAYERS.map(([pid,label])=>{
+      const pts=predPoints(PREDS[pid][m.id],r);
+      return `${label} ${pts==null?"\u2014":"+"+pts}`;
+    }).join(" \u00b7 ");
+    res=`<div class="predres hit">Final ${r.h}\u2013${r.a} \u00b7 ${bits}</div>`;
   }
-  return `<div class="pred"><div class="predhd">Your prediction</div>`+
-    `<div class="predrow"><span class="pn">${m.home}</span>`+
-    `<input class="pin" type="number" min="0" max="30" inputmode="numeric" value="${p.h!=null?p.h:''}" data-s="h">`+
-    `<em>\u2013</em>`+
-    `<input class="pin" type="number" min="0" max="30" inputmode="numeric" value="${p.a!=null?p.a:''}" data-s="a">`+
-    `<span class="pn pnr">${m.away}</span>`+
-    `<button class="psave" data-id="${m.id}">Save</button></div>${res}</div>`;
+  return `<div class="pred"><div class="predhd">Predictions \u00b7 ${m.home} v ${m.away}</div>`+
+    predRow(m,"noah","NOAH")+predRow(m,"nic","NIC")+res+`</div>`;
 }
 function savePrediction(btn){
-  const id=+btn.dataset.id, panel=btn.closest(".wx");
-  const h=parseInt(panel.querySelector('.pin[data-s="h"]').value,10);
-  const a=parseInt(panel.querySelector('.pin[data-s="a"]').value,10);
+  const id=+btn.dataset.id, pid=btn.dataset.p, row=btn.closest(".predrow");
+  const h=parseInt(row.querySelector('.pin[data-s="h"]').value,10);
+  const a=parseInt(row.querySelector('.pin[data-s="a"]').value,10);
   if(isNaN(h)||isNaN(a)){btn.textContent="Enter both";setTimeout(()=>btn.textContent="Save",1200);return;}
-  PREDS[id]={h:Math.max(0,h),a:Math.max(0,a)};savePreds();
-  const m=MATCHES.find(x=>x.id===id);
-  panel.querySelector(".pred").outerHTML=predHTML(m);
+  PREDS[pid][id]={h:Math.max(0,h),a:Math.max(0,a)};savePreds();
+  btn.textContent="Saved \u2713";setTimeout(()=>btn.textContent="Save",1200);
 }
 function renderPredict(){
   const list=document.getElementById("list");
-  const games=MATCHES.filter(m=>m.stage==="Group Stage");
-  let total=0,made=0,scored=0;const rows=[];
-  games.forEach(m=>{const p=PREDS[m.id];if(!p)return;made++;
-    const r=RESULTS[m.id];let cell;
-    if(r&&r.h!=null){const pts=predPoints(p,r);total+=pts;scored++;
-      cell=`<span class="pp ${pts===3?'hit':pts===1?'part':'miss'}">${p.h}\u2013${p.a} \u2192 ${r.h}\u2013${r.a} \u00b7 +${pts}</span>`;}
-    else cell=`<span class="pp pend">${p.h}\u2013${p.a} \u00b7 pending</span>`;
-    rows.push(`<div class="prow"><span class="pteams">${m.home} v ${m.away}</span>${cell}</div>`);
+  const games=MATCHES.filter(m=>m.stage==="Group Stage").sort((a,b)=>Date.parse(a.utc)-Date.parse(b.utc));
+  const tot={noah:0,nic:0};let any=false;
+  const rows=[];
+  games.forEach(m=>{
+    const r=RESULTS[m.id], pn=PREDS.noah[m.id], pc=PREDS.nic[m.id];
+    if(!pn&&!pc)return;
+    any=true;
+    const cell=(pid,p)=>{
+      if(!p)return `<span class="pp miss">\u2014</span>`;
+      if(r&&r.h!=null){const pts=predPoints(p,r);tot[pid]+=pts;
+        return `<span class="pp ${pts===3?'hit':pts===1?'part':'miss'}">${p.h}\u2013${p.a} +${pts}</span>`;}
+      return `<span class="pp pend">${p.h}\u2013${p.a}</span>`;
+    };
+    const nCell=cell("noah",pn), cCell=cell("nic",pc);
+    rows.push(`<div class="prow"><span class="pteams">${m.home} v ${m.away}${r&&r.h!=null?` <em class="fres">${r.h}\u2013${r.a}</em>`:''}</span>`+
+      `<span class="ppair"><span class="pchip noah">NOAH</span>${nCell}<span class="pchip nic">NIC</span>${cCell}</span></div>`);
   });
-  let html=`<div class="predsum"><div class="bigpts">${total}</div><div class="psub">points${made?` \u00b7 ${made} predicted${scored?`, ${scored} settled`:''}`:''}</div></div>`;
-  html += rows.length ? '<div class="predlist">'+rows.join("")+'</div>'
-    : '<div class="empty">No predictions yet.<br>Open a group match on Fixtures, tap Details, and enter a score.<br><br>3 pts for the exact score \u00b7 1 pt for the right result.</div>';
+  const lead = tot.noah>tot.nic?`Noah leads by ${tot.noah-tot.nic}`:tot.nic>tot.noah?`Nic leads by ${tot.nic-tot.noah}`:"All square";
+  let html=`<div class="predsum"><div class="h2h">`+
+    `<div class="h2c noah"><i>NOAH</i><b>${tot.noah}</b></div><div class="vs">vs</div>`+
+    `<div class="h2c nic"><i>NIC</i><b>${tot.nic}</b></div></div>`+
+    `<div class="psub">${lead} \u00b7 3 pts exact \u00b7 1 pt result</div></div>`;
+  html += any ? '<div class="predlist">'+rows.join("")+'</div>'
+    : '<div class="empty">No predictions yet.<br>Open a group match on Fixtures, tap Details \u2014 there\u2019s a row for Noah and a row for Nic.<br><br>3 pts for the exact score \u00b7 1 pt for the right result.</div>';
   list.innerHTML=html;
 }
 function renderScorers(){
@@ -522,7 +565,7 @@ function applyView(){
   document.getElementById("filters").classList.toggle("hide",!fx);
   document.getElementById("searchbox").classList.toggle("hide",!fx);
   document.getElementById("tz").classList.toggle("hide",!fx);
-  const subs={groups:"Standings update as results come in",predict:"3 pts exact score \u00b7 1 pt correct result",scorers:"Golden Boot \u2014 top 10 goal scorers"};
+  const subs={groups:"Standings update as results come in",predict:"Noah vs Nic \u00b7 3 pts exact \u00b7 1 pt result",scorers:"Golden Boot \u2014 top 10 goal scorers"};
   document.getElementById("subline").innerHTML=fx?`All times in <b id="tzlabel">${TZ.split("/")[1].replace("_"," ")}</b>`:(subs[VIEW]||"");
   render();stamp();
 }
@@ -536,6 +579,7 @@ async function refresh(){rbtn.classList.add("spin");await fetchResults();render(
 rbtn.addEventListener("click",refresh);
 buildFilters();applyView();refresh();
 setInterval(()=>{render();stamp();},60000);
+setInterval(async()=>{await fetchResults();render();stamp();},300000);
 </script>
 </body>
 </html>
